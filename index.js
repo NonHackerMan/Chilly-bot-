@@ -59,41 +59,129 @@ const parseTime = t => {
 }
 
 const commands = [
-  new SlashCommandBuilder().setName('ban').setDescription('ban')
-    .addUserOption(o => o.setName('user').setRequired(true)),
-  new SlashCommandBuilder().setName('kick').setDescription('kick')
-    .addUserOption(o => o.setName('user').setRequired(true)),
-  new SlashCommandBuilder().setName('mute').setDescription('mute')
-    .addUserOption(o => o.setName('user').setRequired(true))
-    .addStringOption(o => o.setName('time').setRequired(true)),
-  new SlashCommandBuilder().setName('lock').setDescription('lock'),
-  new SlashCommandBuilder().setName('unlock').setDescription('unlock'),
-  new SlashCommandBuilder().setName('purge').setDescription('purge')
-    .addIntegerOption(o => o.setName('amount').setRequired(true)),
-  new SlashCommandBuilder().setName('slowmode').setDescription('slowmode')
-    .addIntegerOption(o => o.setName('seconds').setRequired(true)),
-  new SlashCommandBuilder().setName('nuke').setDescription('nuke'),
-  new SlashCommandBuilder().setName('lockdown').setDescription('lockdown'),
-  new SlashCommandBuilder().setName('unlockdown').setDescription('unlockdown'),
-  new SlashCommandBuilder().setName('gamble').setDescription('gamble'),
-  new SlashCommandBuilder().setName('whatshouldiwatch').setDescription('watch'),
-  new SlashCommandBuilder().setName('infractions').setDescription('infractions')
-    .addUserOption(o => o.setName('user').setRequired(true)),
-  new SlashCommandBuilder().setName('clearinfractions').setDescription('clear')
-    .addUserOption(o => o.setName('user').setRequired(true)),
-  new SlashCommandBuilder().setName('massmute').setDescription('massmute')
-    .addStringOption(o => o.setName('time').setRequired(true)),
-  new SlashCommandBuilder().setName('antiraid').setDescription('antiraid'),
-  new SlashCommandBuilder().setName('unlockantiraid').setDescription('unlockantiraid')
-]
+  new SlashCommandBuilder()
+    .setName('ban')
+    .setDescription('ban a user')
+    .addUserOption(o =>
+      o.setName('user')
+       .setDescription('target user')
+       .setRequired(true)
+    ),
 
+  new SlashCommandBuilder()
+    .setName('kick')
+    .setDescription('kick a user')
+    .addUserOption(o =>
+      o.setName('user')
+       .setDescription('target user')
+       .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName('mute')
+    .setDescription('mute a user')
+    .addUserOption(o =>
+      o.setName('user')
+       .setDescription('target user')
+       .setRequired(true)
+    )
+    .addStringOption(o =>
+      o.setName('time')
+       .setDescription('duration like 10m 1h 1d')
+       .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName('lock')
+    .setDescription('lock the channel'),
+
+  new SlashCommandBuilder()
+    .setName('unlock')
+    .setDescription('unlock the channel'),
+
+  new SlashCommandBuilder()
+    .setName('purge')
+    .setDescription('delete messages')
+    .addIntegerOption(o =>
+      o.setName('amount')
+       .setDescription('number of messages')
+       .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName('slowmode')
+    .setDescription('set slowmode')
+    .addIntegerOption(o =>
+      o.setName('seconds')
+       .setDescription('seconds per message')
+       .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName('nuke')
+    .setDescription('recreate channel'),
+
+  new SlashCommandBuilder()
+    .setName('lockdown')
+    .setDescription('lock all channels'),
+
+  new SlashCommandBuilder()
+    .setName('unlockdown')
+    .setDescription('unlock all channels'),
+
+  new SlashCommandBuilder()
+    .setName('gamble')
+    .setDescription('random win or lose'),
+
+  new SlashCommandBuilder()
+    .setName('whatshouldiwatch')
+    .setDescription('random youtube video'),
+
+  new SlashCommandBuilder()
+    .setName('infractions')
+    .setDescription('view infractions')
+    .addUserOption(o =>
+      o.setName('user')
+       .setDescription('target user')
+       .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName('clearinfractions')
+    .setDescription('clear infractions')
+    .addUserOption(o =>
+      o.setName('user')
+       .setDescription('target user')
+       .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName('massmute')
+    .setDescription('mute everyone')
+    .addStringOption(o =>
+      o.setName('time')
+       .setDescription('duration like 10m 1h')
+       .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName('antiraid')
+    .setDescription('enable antiraid'),
+
+  new SlashCommandBuilder()
+    .setName('unlockantiraid')
+    .setDescription('disable antiraid')
+]
 const rest = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN)
 
 client.once('ready', async () => {
   await rest.put(
-    Routes.applicationCommands(client.user.id),
-    { body: commands.map(c => c.toJSON()) }
-  )
+  Routes.applicationGuildCommands(
+    client.user.id,
+    process.env.GUILD_ID
+  ),
+  { body: commands.map(c => c.toJSON()) }
+)
 })
 
 client.on('messageCreate', async m => {
