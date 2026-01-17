@@ -471,7 +471,7 @@ commands.set('recoload', {
         createdCategoryMap.set(cat.id, existing as CategoryChannel);
         continue;
       }
-      const created = await guild.channels.create({ name: cat.name, type: ChannelType.GuildCategory }).catch(() => null);
+      const created = await guild.channels.create({ name: String(cat.name), type: ChannelType.GuildCategory }).catch(() => null);
       if (created && created.type === ChannelType.GuildCategory) createdCategoryMap.set(cat.id, created as CategoryChannel);
     }
     for (const ch of texts) {
@@ -479,8 +479,8 @@ commands.set('recoload', {
       if (existing) {
         await existing.delete().catch(() => null);
       }
-      const parent = ch.parentId ? createdCategoryMap.get(ch.parentId) ?? undefined : undefined;
-      const created = await guild.channels.create({ name: ch.name, type: ch.type === ChannelType.GuildAnnouncement ? ChannelType.GuildAnnouncement : ChannelType.GuildText, parent: parent?.id ?? undefined }).catch(() => null);
+      const parent = ch.parentId ? createdCategoryMap.get(String(ch.parentId)) ?? undefined : undefined;
+      const created = await guild.channels.create({ name: String(ch.name), type: ch.type === ChannelType.GuildAnnouncement ? ChannelType.GuildAnnouncement : ChannelType.GuildText, parent: parent?.id ?? undefined }).catch(() => null);
       if (!created) continue;
       for (const m of ch.messages) {
         const parts: any = { content: m.content || '' };
