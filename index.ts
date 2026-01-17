@@ -25,7 +25,7 @@ import crypto from 'crypto';
 import Database from 'better-sqlite3';
 
 type Command = {
-  data: SlashCommandBuilder;
+  data: any;
   cooldown?: number;
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
 };
@@ -166,7 +166,7 @@ commands.set('help', {
 });
 
 commands.set('remind', {
-  data: new SlashCommandBuilder().setName('remind').setDescription('Set a reminder').addStringOption((o) => o.setName('in').setDescription('Duration (e.g. 10m)').setRequired(true)).addStringOption((o) => o.setName('text').setDescription('Reminder message').setRequired(true)),
+  data: (new SlashCommandBuilder().setName('remind').setDescription('Set a reminder').addStringOption((o) => o.setName('in').setDescription('Duration (e.g. 10m)').setRequired(true)).addStringOption((o) => o.setName('text').setDescription('Reminder message').setRequired(true))) as any,
   cooldown: 5,
   execute: async (interaction) => {
     const cid = newCid();
@@ -193,7 +193,7 @@ commands.set('remind', {
 });
 
 commands.set('poll', {
-  data: new SlashCommandBuilder().setName('poll').setDescription('Create a quick poll').addStringOption((o) => o.setName('question').setDescription('Poll question').setRequired(true)).addStringOption((o) => o.setName('options').setDescription('Options separated by | (max 5)').setRequired(true)).addIntegerOption((o) => o.setName('duration').setDescription('Duration in seconds (default 60)')),
+  data: (new SlashCommandBuilder().setName('poll').setDescription('Create a quick poll').addStringOption((o) => o.setName('question').setDescription('Poll question').setRequired(true)).addStringOption((o) => o.setName('options').setDescription('Options separated by | (max 5)').setRequired(true)).addIntegerOption((o) => o.setName('duration').setDescription('Duration in seconds (default 60)'))) as any,
   cooldown: 10,
   execute: async (interaction) => {
     const cid = newCid();
@@ -270,7 +270,9 @@ commands.set('whattowatch', {
         return;
       }
       const json = await res.json();
-      const embed = new EmbedBuilder().setTitle(json.title || 'YouTube Video').setDescription(json.author_name || '').setURL(url).setFooter({ text: `cid: ${cid}` }).setTimestamp();
+      const title = (json && json.title) ? String(json.title) : 'YouTube Video';
+      const author = (json && json.author_name) ? String(json.author_name) : '';
+      const embed = new EmbedBuilder().setTitle(title).setDescription(author).setURL(String(url)).setFooter({ text: `cid: ${cid}` }).setTimestamp();
       await interaction.reply({ embeds: [embed] });
     } catch {
       await interaction.reply({ content: `Error validating video (cid: ${cid})`, ephemeral: true });
@@ -343,6 +345,7 @@ commands.set('lockall', {
     const everyone = interaction.guild!.roles.everyone;
     const fetched = await interaction.guild!.channels.fetch();
     for (const ch of fetched.values()) {
+      if (!ch) continue;
       if (ch.type === ChannelType.GuildText || ch.type === ChannelType.GuildAnnouncement || ch.type === ChannelType.GuildForum) {
         await ch.permissionOverwrites.edit(everyone, { SendMessages: false }).catch(() => null);
       }
@@ -368,6 +371,7 @@ commands.set('unlockall', {
     const everyone = interaction.guild!.roles.everyone;
     const fetched = await interaction.guild!.channels.fetch();
     for (const ch of fetched.values()) {
+      if (!ch) continue;
       if (ch.type === ChannelType.GuildText || ch.type === ChannelType.GuildAnnouncement || ch.type === ChannelType.GuildForum) {
         await ch.permissionOverwrites.edit(everyone, { SendMessages: null }).catch(() => null);
       }
@@ -394,6 +398,7 @@ commands.set('recosave', {
     const fetched = await guild.channels.fetch();
     const channelsData: SavedChannel[] = [];
     for (const ch of fetched.values()) {
+      if (!ch) continue;
       if (ch.type === ChannelType.GuildText || ch.type === ChannelType.GuildAnnouncement || ch.type === ChannelType.GuildForum) {
         const saved: SavedChannel = {
           id: ch.id,
@@ -475,7 +480,7 @@ commands.set('recoload', {
         await existing.delete().catch(() => null);
       }
       const parent = ch.parentId ? createdCategoryMap.get(ch.parentId) ?? undefined : undefined;
-      const created = await guild.channels.create({ name: ch.name, type: ch.type === ChannelType.GuildAnnouncement ? ChannelType.GuildAnnouncement : ChannelType.GuildText, parent: parent?.id }).catch(() => null);
+      const created = await guild.channels.create({ name: ch.name, type: ch.type === ChannelType.GuildAnnouncement ? ChannelType.GuildAnnouncement : ChannelType.GuildText, parent: parent?.id ?? undefined }).catch(() => null);
       if (!created) continue;
       for (const m of ch.messages) {
         const parts: any = { content: m.content || '' };
