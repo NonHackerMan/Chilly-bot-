@@ -1,4 +1,4 @@
 declare module 'better-sqlite3' {
-  const value: any;
-  export default value;
+  const content: any;
+  export default content;
 }
