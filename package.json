@@ -19,5 +19,5 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
-  "license": ""
+  "license": "Apache License 2.0"
 }
