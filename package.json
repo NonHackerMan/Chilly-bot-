@@ -4,10 +4,14 @@
   "description": "Chilly-bot converted to TypeScript with channel management and snapshots",
   "main": "dist/index.js",
   "type": "module",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "dev": "ts-node index.ts"
+    "dev": "ts-node index.ts",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "better-sqlite3": "^8.3.0",
@@ -19,5 +23,5 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
-  "license": "Apache License 2.0"
+  "license": "Apache-2.0"
 }
